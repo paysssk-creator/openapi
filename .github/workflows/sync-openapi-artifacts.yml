@@ -37,27 +37,35 @@ jobs:
           mkdir -p ./preview
 
       - name: Download latest (GA) JSON specs
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
-          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/${{ inputs.version }}/ga/public.json" \
+          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/$VERSION/ga/public.json" \
             -o ./latest/openapi.spec3.json
-          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/${{ inputs.version }}/ga/sdk.json" \
+          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/$VERSION/ga/sdk.json" \
             -o ./latest/openapi.sdk.spec3.json
 
       - name: Download latest (GA) YAML specs
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
-          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/${{ inputs.version }}/ga/public.yaml" \
+          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/$VERSION/ga/public.yaml" \
             -o ./latest/openapi.spec3.yaml
-          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/${{ inputs.version }}/ga/sdk.yaml" \
+          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/$VERSION/ga/sdk.yaml" \
             -o ./latest/openapi.sdk.spec3.yaml
 
       - name: Download preview JSON specs
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
-          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/${{ inputs.version }}/public_preview/sdk.json" \
+          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/$VERSION/public_preview/sdk.json" \
             -o ./preview/openapi.spec3.sdk.json
 
       - name: Download preview YAML specs
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
-          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/${{ inputs.version }}/public_preview/sdk.yaml" \
+          curl -fsSL "https://b.stripecdn.com/api-artifacts/assets/openapi/$VERSION/public_preview/sdk.yaml" \
             -o ./preview/openapi.spec3.sdk.yaml
 
       - name: Check for changes
@@ -72,9 +80,11 @@ jobs:
 
       - name: Commit and push
         if: steps.changes.outputs.has_changes == 'true'
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
           git config user.name "Stripe OpenAPI"
           git config user.email "105521251+stripe-openapi[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Update OpenAPI for ${{ inputs.version }}"
+          git commit -m "Update OpenAPI for $VERSION"
           git push
