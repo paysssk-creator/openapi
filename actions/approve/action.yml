@@ -24,14 +24,16 @@ runs:
       with:
         app_id: ${{ inputs.github_app_id }}
         private_key: ${{ inputs.github_app_private_key }}
-    - run: |
-        set -e -x -o pipefail
-
-        PR_STATUS=$(gh pr -R ${{ inputs.repo }} view --json reviewDecision -q ".reviewDecision" ${{ inputs.pr_url_or_branch }} )
-        if [ "$PR_STATUS" == "REVIEW_REQUIRED" ]; then
-          gh pr -R ${{ inputs.repo }} review --approve ${{ inputs.pr_url_or_branch }}
-        fi
-      name: Auto-approve
+    - name: Auto-approve
       shell: bash
       env:
+        REPO: ${{ inputs.repo }}
+        PR_URL_OR_BRANCH: ${{ inputs.pr_url_or_branch }}
         GITHUB_TOKEN: ${{ steps.gh-approver-api-token.outputs.token }}
+      run: |
+        set -e -x -o pipefail
+
+        PR_STATUS=$(gh pr -R $REPO view --json reviewDecision -q ".reviewDecision" $PR_URL_OR_BRANCH )
+        if [ "$PR_STATUS" == "REVIEW_REQUIRED" ]; then
+          gh pr -R $REPO review --approve $PR_URL_OR_BRANCH
+        fi
