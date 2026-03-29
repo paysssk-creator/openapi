@@ -22,20 +22,23 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+        PR_URL: ${{ inputs.pr_url }}
+        REPO: ${{ inputs.repo }}
+        MODE: ${{ inputs.mode }}
       continue-on-error: true
       run: |
         set -e -o pipefail
 
-        if [ "${{ inputs.pr_url }}" == "" ]; then
+        if [ "$PR_URL" == "" ]; then
           echo "PR URL is required"
           exit 1
         fi
 
-        PR_ID=$(gh -R ${{ inputs.repo }} pr view ${{ inputs.pr_url }} --json id --jq ".id")
+        PR_ID=$(gh -R $REPO pr view $PR_URL --json id --jq ".id")
 
         gh api graphql -f query='
           mutation($pull: ID!) {
-            enablePullRequestAutoMerge(input: {pullRequestId: $pull, mergeMethod: ${{ inputs.mode }}}) {
+            enablePullRequestAutoMerge(input: {pullRequestId: $pull, mergeMethod: '$MODE'}) {
               pullRequest {
                 id
                 number
